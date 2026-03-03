@@ -128,6 +128,7 @@ hist(bsf_scores$score)
 df_subset <- df %>% 
   filter(flagg1+flagg2+flagg3==3) %>% 
   filter(g1classtype == g2classtype & g2classtype == g3classtype) %>% 
+  filter(g1schid == g2schid & g2schid == g3schid) %>% 
   mutate(class_type = as.factor(case_match(
     g1classtype,
     1 ~ "small",
@@ -148,7 +149,7 @@ df_subset <- df %>%
     5 ~ "native_american",
     6 ~ "other"
   ))) %>% 
-  select(stdntid, gender, race, class_type, all_of(score_cols_sat)) %>% 
+  select(stdntid, g1schid, g1surban, gender, race, class_type, all_of(score_cols_sat)) %>% 
   pivot_longer(cols = all_of(score_cols_sat), names_to = "score_type", values_to = "score") %>%
   mutate(
     subject = case_when(
@@ -158,8 +159,17 @@ df_subset <- df %>%
     grade = as.factor(case_when(
       str_detect(score_type, "g1") ~ 1,
       str_detect(score_type, "g2") ~ 2,
-      str_detect(score_type, "g3") ~ 3
-    )))
+      str_detect(score_type, "g3") ~ 3)
+    ),
+    schid = as.factor(g1schid),
+    urban = as.factor(case_match(
+      g1surban,
+      1 ~ "inner city",
+      2 ~ "suburban",
+      3 ~ "rural",
+      4 ~ "urban"))
+    ) |> 
+  select(-c(score_type, g1schid, g1surban))
 
 save(df_subset, file = "../data/df_subset.rda")
   
