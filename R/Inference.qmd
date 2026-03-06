@@ -1,0 +1,130 @@
+---
+title: "STA 207 Final - Inference"
+format: html
+---
+
+# Data loading and Libraries
+
+```{r}
+load("C:/Users/user/Documents/GitHub/STA207/sta207-project/data/df_subset.rda")
+
+# Convert column "subject" into factor
+df_subset$subject <- as.factor(df_subset$subject)
+
+# Libraries
+library(dplyr)
+library(car)
+library(lme4)
+```
+
+# Check For Collinearity
+
+For each school, it has a unique `urban` status.
+```{r}
+# Shows a school that has the most urban type(s)
+check_nesting <- df_subset %>%
+  group_by(schid) %>%
+  summarize(n_urban_types = n_distinct(urban)) %>%
+  summarize(max_n_urban = max(n_urban_types))
+
+print(check_nesting)
+```
+
+All students go to one school only.
+```{r}
+# Shows a school that has the most urban type(s)
+check_stdnt_sch <- df_subset %>%
+  group_by(stdntid) %>%
+  summarize(n_schs = n_distinct(schid)) %>%
+  summarize(max_n_schs = max(n_schs))
+
+print(check_stdnt_sch)
+```
+
+
+# Inferential Analysis
+
+## Model Proposal:
+
+### Multiple Linear Regression
+To find the best multiple linear model, we begin with our full model selected from our EDA.
+
+```{r}
+full_model <- lm(score ~ class_type+subject+class_type+gender+race+grade+urban, df_subset)
+summary(full_model)
+```
+
+From the summary statistic, we see that all the variables are signifcantly associated with score.
+
+We consider running ANOVA on this full model using Type III Sum of Squares:
+```{r}
+Anova(full_model, type="III")
+```
+
+From the summaries of multiple linear model and the ANOVA, we don't find any variable that is obviously irrelavant to scores. Thus, we keep all these variables and continue to fit our mixed effect model to discover causal relationship.
+
+### Mixed Effects Model
+Stratifying using `schid`: Grouping students by schools.
+
+```{r}
+mixed_model_sch <- lmer(score
+    ~ class_type
+    + subject
+    + gender
+    + race
+    + grade
+    + (1|schid),
+    data=df_subset)
+
+summary(mixed_model_sch)
+```
+
+Stratifying using `stdntid`: Consider each student as a group.
+```{r}
+mixed_model_std <- lmer(score
+    ~ class_type
+    + subject
+    + gender
+    + race
+    + grade
+    + (1|stdntid),
+    data=df_subset)
+
+summary(mixed_model_std)
+```
+
+Stratifying using both `schid` and `stdntid`: See how much does school affect the score.
+```{r}
+mixed_model_std <- lmer(score
+    ~ class_type
+    + subject
+    + gender
+    + race
+    + grade
+    + (1|stdntid)
+    + (1|schid),
+    data=df_subset)
+
+summary(mixed_model_std)
+```
+
+---
+
+We make the following assumptions for our models:
+
+1. Linearity: The relationship between predictors and the outcome is linear.
+2. Independence: Observations (students) are independent.
+3. Homoscedasticity: The variance of error terms is constant across groups.
+4. Normality: The residuals are approximately normally distributed.
+
+The coefficient $\beta_1$ estimates the treatment effect of being in a small coass, while the coefficient $\beta_2$ estimates the treatment effect of being in a regular class with aide.
+
+```{r}
+model <- lm(score~class_type+subject+class_type*subject, df_subset)
+summary(model)
+anova(model)
+```
+
+# Conclusion
+
+Small class indeed leads to better students' performance, regardless of which school they attend or the innate intellegence each student have.
