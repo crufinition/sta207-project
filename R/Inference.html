@@ -1,0 +1,967 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>STA 207 Final - Inference</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="Inference_files/libs/clipboard/clipboard.min.js"></script>
+<script src="Inference_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="Inference_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="Inference_files/libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="Inference_files/libs/quarto-html/popper.min.js"></script>
+<script src="Inference_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="Inference_files/libs/quarto-html/anchor.min.js"></script>
+<link href="Inference_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="Inference_files/libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="Inference_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="Inference_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="Inference_files/libs/bootstrap/bootstrap-9e3ffae467580fdb927a41352e75a2e0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="fullcontent quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">STA 207 Final - Inference</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="data-loading-and-libraries" class="level1">
+<h1>Data loading and Libraries</h1>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="st">"C:/Users/user/Documents/GitHub/STA207/sta207-project/data/df_subset.rda"</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert column "subject" into factor</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>df_subset<span class="sc">$</span>subject <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(df_subset<span class="sc">$</span>subject)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># Libraries</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'dplyr'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:stats':
+
+    filter, lag</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following objects are masked from 'package:base':
+
+    intersect, setdiff, setequal, union</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(car)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: carData</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'car'</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:dplyr':
+
+    recode</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lme4)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loading required package: Matrix</code></pre>
+</div>
+</div>
+</section>
+<section id="check-for-collinearity" class="level1">
+<h1>Check For Collinearity</h1>
+<p>For each school, it has a unique <code>urban</code> status.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows a school that has the most urban type(s)</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>check_nesting <span class="ot">&lt;-</span> df_subset <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(schid) <span class="sc">%&gt;%</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_urban_types =</span> <span class="fu">n_distinct</span>(urban)) <span class="sc">%&gt;%</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_n_urban =</span> <span class="fu">max</span>(n_urban_types))</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(check_nesting)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  max_n_urban
+        &lt;int&gt;
+1           1</code></pre>
+</div>
+</div>
+<p>All students go to one school only.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows a school that has the most urban type(s)</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>check_stdnt_sch <span class="ot">&lt;-</span> df_subset <span class="sc">%&gt;%</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(stdntid) <span class="sc">%&gt;%</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_schs =</span> <span class="fu">n_distinct</span>(schid)) <span class="sc">%&gt;%</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_n_schs =</span> <span class="fu">max</span>(n_schs))</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(check_stdnt_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 1 × 1
+  max_n_schs
+       &lt;int&gt;
+1          1</code></pre>
+</div>
+</div>
+</section>
+<section id="inferential-analysis" class="level1">
+<h1>Inferential Analysis</h1>
+<section id="model-proposal" class="level2">
+<h2 class="anchored" data-anchor-id="model-proposal">Model Proposal:</h2>
+<section id="multiple-linear-regression" class="level3">
+<h3 class="anchored" data-anchor-id="multiple-linear-regression">Multiple Linear Regression</h3>
+<p>To find the best multiple linear model, we begin with our full model selected from our EDA.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(score <span class="sc">~</span> class_type<span class="sc">+</span>subject<span class="sc">+</span>class_type<span class="sc">+</span>gender<span class="sc">+</span>race<span class="sc">+</span>grade<span class="sc">+</span>urban, df_subset)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ class_type + subject + class_type + gender + 
+    race + grade + urban, data = df_subset)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-146.779  -26.630   -1.805   24.488  160.350 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            576.6354     4.7200 122.168  &lt; 2e-16 ***
+class_typeregular_plus   1.7111     0.5615   3.047 0.002312 ** 
+class_typesmall          8.8677     0.5737  15.458  &lt; 2e-16 ***
+subjectmath            -17.0796     0.5539 -30.838  &lt; 2e-16 ***
+subjectreading         -18.1856     0.5558 -32.719  &lt; 2e-16 ***
+gendermale              -1.5702     0.4538  -3.460 0.000540 ***
+raceblack              -39.4015     4.6410  -8.490  &lt; 2e-16 ***
+racehispanic           -11.1117     8.1931  -1.356 0.175039    
+raceother               -0.2655     8.8000  -0.030 0.975930    
+racewhite              -16.4785     4.6026  -3.580 0.000344 ***
+grade2                  43.0146     0.5535  77.710  &lt; 2e-16 ***
+grade3                  73.0656     0.5549 131.666  &lt; 2e-16 ***
+urbanrural               6.5528     0.9867   6.641 3.17e-11 ***
+urbansuburban            8.7689     0.9486   9.244  &lt; 2e-16 ***
+urbanurban               3.8144     1.2320   3.096 0.001963 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 38.95 on 29528 degrees of freedom
+  (895 observations deleted due to missingness)
+Multiple R-squared:  0.4215,    Adjusted R-squared:  0.4212 
+F-statistic:  1537 on 14 and 29528 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+</div>
+<p>From the summary statistic, we see that all the variables are signifcantly associated with score.</p>
+<p>We consider running ANOVA on this full model using Type III Sum of Squares:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(full_model, <span class="at">type=</span><span class="st">"III"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Anova Table (Type III tests)
+
+Response: score
+              Sum Sq    Df   F value    Pr(&gt;F)    
+(Intercept) 22639583     1 14925.026 &lt; 2.2e-16 ***
+class_type    424663     2   139.978 &lt; 2.2e-16 ***
+subject      2049456     2   675.547 &lt; 2.2e-16 ***
+gender         18162     1    11.973 0.0005404 ***
+race         1436747     4   236.792 &lt; 2.2e-16 ***
+grade       26610041     2  8771.265 &lt; 2.2e-16 ***
+urban         149340     3    32.817 &lt; 2.2e-16 ***
+Residuals   44790648 29528                        
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+<p>From the summaries of multiple linear model and the ANOVA, we don’t find any variable that is obviously irrelavant to scores. Thus, we keep all these variables and continue to fit our mixed effect model to discover causal relationship.</p>
+</section>
+<section id="mixed-effects-model" class="level3">
+<h3 class="anchored" data-anchor-id="mixed-effects-model">Mixed Effects Model</h3>
+<p>Stratifying using <code>schid</code>: Grouping students by schools.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mixed_model_sch <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: score ~ class_type + subject + gender + race + grade + (1 | schid)
+   Data: df_subset
+
+REML criterion at convergence: 298277.2
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.7565 -0.6788 -0.0423  0.6275  4.1076 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ schid    (Intercept)  139.6   11.82   
+ Residual             1409.0   37.54   
+Number of obs: 29543, groups:  schid, 75
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            583.1098     4.7140 123.699
+class_typeregular_plus   0.7379     0.5566   1.326
+class_typesmall          9.4508     0.5661  16.694
+subjectmath            -17.0823     0.5338 -32.001
+subjectreading         -18.1964     0.5364 -33.924
+gendermale              -1.5986     0.4416  -3.620
+raceblack              -40.3274     4.5421  -8.879
+racehispanic           -11.6786     8.0134  -1.457
+raceother               -3.7593     8.5523  -0.440
+racewhite              -18.3140     4.4788  -4.089
+grade2                  43.0039     0.5342  80.501
+grade3                  73.0503     0.5349 136.570
+
+Correlation of Fixed Effects:
+            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
+clss_typrg_ -0.050                                                        
+clss_typsml -0.052  0.541                                                 
+subjectmath -0.057  0.000  0.000                                          
+subjectrdng -0.056  0.001  0.000  0.498                                   
+gendermale  -0.052 -0.022 -0.004  0.000  0.000                            
+raceblack   -0.938 -0.012 -0.013  0.000  0.000  0.004                     
+racehispanc -0.528 -0.009 -0.024  0.000  0.000 -0.008  0.548              
+raceother   -0.495 -0.014 -0.027  0.000  0.000 -0.003  0.515  0.292       
+racewhite   -0.945 -0.016 -0.015  0.000  0.000  0.008  0.980  0.558  0.524
+grade2      -0.056 -0.001  0.000  0.000 -0.002 -0.002  0.000  0.000  0.000
+grade3      -0.057 -0.003 -0.003  0.001 -0.002  0.001  0.001  0.003  0.000
+            racwht grade2
+clss_typrg_              
+clss_typsml              
+subjectmath              
+subjectrdng              
+gendermale               
+raceblack                
+racehispanc              
+raceother                
+racewhite                
+grade2       0.000       
+grade3       0.001  0.494</code></pre>
+</div>
+</div>
+<p>Stratifying using <code>stdntid</code>: Consider each student as a group.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid),</span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: score ~ class_type + subject + gender + race + grade + (1 | stdntid)
+   Data: df_subset
+
+REML criterion at convergence: 285058.7
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.8508 -0.6312 -0.0342  0.5820  5.6907 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stdntid  (Intercept) 850.4    29.16   
+ Residual             685.7    26.19   
+Number of obs: 29543, groups:  stdntid, 3382
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            584.3237    10.8015  54.097
+class_typeregular_plus   1.6135     1.2977   1.243
+class_typesmall          8.8961     1.3247   6.716
+subjectmath            -17.1176     0.3725 -45.958
+subjectreading         -18.3530     0.3743 -49.038
+gendermale              -1.6724     1.0500  -1.593
+raceblack              -43.3040    10.8233  -4.001
+racehispanic           -16.8158    18.7062  -0.899
+raceother               -1.0307    20.6175  -0.050
+racewhite              -17.5773    10.7822  -1.630
+grade2                  43.1266     0.3733 115.519
+grade3                  72.2933     0.3746 192.988
+
+Correlation of Fixed Effects:
+            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
+clss_typrg_ -0.045                                                        
+clss_typsml -0.047  0.544                                                 
+subjectmath -0.017  0.000  0.000                                          
+subjectrdng -0.017  0.001  0.000  0.498                                   
+gendermale  -0.060 -0.025  0.001  0.000  0.000                            
+raceblack   -0.990 -0.017 -0.020  0.000  0.000  0.011                     
+racehispanc -0.572 -0.010 -0.018  0.000  0.000 -0.007  0.572              
+raceother   -0.518 -0.020 -0.030  0.000  0.000 -0.002  0.520  0.301       
+racewhite   -0.994 -0.021 -0.018  0.000  0.000  0.012  0.993  0.575  0.522
+grade2      -0.017  0.000  0.000  0.000 -0.003 -0.001  0.000  0.000  0.000
+grade3      -0.017 -0.001 -0.001  0.001 -0.002  0.001  0.000  0.001  0.000
+            racwht grade2
+clss_typrg_              
+clss_typsml              
+subjectmath              
+subjectrdng              
+gendermale               
+raceblack                
+racehispanc              
+raceother                
+racewhite                
+grade2       0.000       
+grade3       0.000  0.493</code></pre>
+</div>
+</div>
+<p>Stratifying using both <code>schid</code> and <code>stdntid</code>: See how much does school affect the score.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid)</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: 
+score ~ class_type + subject + gender + race + grade + (1 | stdntid) +  
+    (1 | schid)
+   Data: df_subset
+
+REML criterion at convergence: 284819.6
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.8275 -0.6323 -0.0331  0.5811  5.6791 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stdntid  (Intercept) 752.0    27.42   
+ schid    (Intercept) 112.2    10.59   
+ Residual             685.7    26.19   
+Number of obs: 29543, groups:  stdntid, 3382; schid, 75
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            583.9915    10.3859  56.229
+class_typeregular_plus   0.9408     1.2575   0.748
+class_typesmall          9.5681     1.2796   7.478
+subjectmath            -17.1174     0.3725 -45.957
+subjectreading         -18.3518     0.3743 -49.024
+gendermale              -1.6594     1.0018  -1.656
+raceblack              -42.1978    10.3928  -4.060
+racehispanic           -16.5231    17.9088  -0.923
+raceother               -3.8389    19.6483  -0.195
+racewhite              -18.5213    10.2863  -1.801
+grade2                  43.1221     0.3734 115.485
+grade3                  72.3041     0.3746 193.022
+
+Correlation of Fixed Effects:
+            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
+clss_typrg_ -0.050                                                        
+clss_typsml -0.053  0.541                                                 
+subjectmath -0.018  0.000  0.000                                          
+subjectrdng -0.018  0.000  0.000  0.498                                   
+gendermale  -0.055 -0.022 -0.002  0.000  0.000                            
+raceblack   -0.979 -0.013 -0.015  0.000  0.000  0.005                     
+racehispanc -0.565 -0.006 -0.020  0.000  0.000 -0.009  0.566              
+raceother   -0.516 -0.014 -0.027  0.000  0.000 -0.002  0.517  0.300       
+racewhite   -0.986 -0.017 -0.015  0.000  0.000  0.008  0.985  0.572  0.523
+grade2      -0.018  0.000  0.000  0.000 -0.002 -0.001  0.000  0.000  0.000
+grade3      -0.018 -0.001 -0.001  0.001 -0.002  0.001  0.000  0.001  0.000
+            racwht grade2
+clss_typrg_              
+clss_typsml              
+subjectmath              
+subjectrdng              
+gendermale               
+raceblack                
+racehispanc              
+raceother                
+racewhite                
+grade2       0.000       
+grade3       0.000  0.493</code></pre>
+</div>
+</div>
+<hr>
+<p>We make the following assumptions for our models:</p>
+<ol type="1">
+<li>Linearity: The relationship between predictors and the outcome is linear.</li>
+<li>Independence: Observations (students) are independent.</li>
+<li>Homoscedasticity: The variance of error terms is constant across groups.</li>
+<li>Normality: The residuals are approximately normally distributed.</li>
+</ol>
+<p>The coefficient <span class="math inline">\(\beta_1\)</span> estimates the treatment effect of being in a small coass, while the coefficient <span class="math inline">\(\beta_2\)</span> estimates the treatment effect of being in a regular class with aide.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>model <span class="ot">&lt;-</span> <span class="fu">lm</span>(score<span class="sc">~</span>class_type<span class="sc">+</span>subject<span class="sc">+</span>class_type<span class="sc">*</span>subject, df_subset)</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ class_type + subject + class_type * subject, 
+    data = df_subset)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-158.916  -34.084    0.751   34.795  192.677 
+
+Coefficients:
+                                      Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)                           600.2491     0.9365 640.924  &lt; 2e-16 ***
+class_typeregular_plus                  1.3874     1.2541   1.106 0.268615    
+class_typesmall                         4.9561     1.2801   3.872 0.000108 ***
+subjectmath                           -18.9259     1.3236 -14.299  &lt; 2e-16 ***
+subjectreading                        -21.1651     1.3272 -15.947  &lt; 2e-16 ***
+class_typeregular_plus:subjectmath      0.7544     1.7724   0.426 0.670385    
+class_typesmall:subjectmath             4.4078     1.8094   2.436 0.014853 *  
+class_typeregular_plus:subjectreading   2.9108     1.7789   1.636 0.101786    
+class_typesmall:subjectreading          5.8764     1.8144   3.239 0.001202 ** 
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 50.39 on 29534 degrees of freedom
+  (895 observations deleted due to missingness)
+Multiple R-squared:  0.03139,   Adjusted R-squared:  0.03113 
+F-statistic: 119.6 on 8 and 29534 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">anova</span>(model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Analysis of Variance Table
+
+Response: score
+                      Df   Sum Sq Mean Sq  F value Pr(&gt;F)    
+class_type             2   349797  174898  68.8790 &lt;2e-16 ***
+subject                2  2048304 1024152 403.3344 &lt;2e-16 ***
+class_type:subject     4    32365    8091   3.1865 0.0126 *  
+Residuals          29534 74993110    2539                    
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
+</div>
+</div>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Small class indeed leads to better students’ performance, regardless of which school they attend or the innate intellegence each student have.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
