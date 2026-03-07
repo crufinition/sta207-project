@@ -95,7 +95,7 @@ summary(mixed_model_std)
 
 Stratifying using both `schid` and `stdntid`: See how much does school affect the score.
 ```{r}
-mixed_model_std <- lmer(score
+mixed_model_std_sch <- lmer(score
     ~ class_type
     + subject
     + gender
@@ -105,7 +105,7 @@ mixed_model_std <- lmer(score
     + (1|schid),
     data=df_subset)
 
-summary(mixed_model_std)
+summary(mixed_model_std_sch)
 ```
 
 ---
@@ -117,13 +117,38 @@ We make the following assumptions for our models:
 3. Homoscedasticity: The variance of error terms is constant across groups.
 4. Normality: The residuals are approximately normally distributed.
 
-The coefficient $\beta_1$ estimates the treatment effect of being in a small coass, while the coefficient $\beta_2$ estimates the treatment effect of being in a regular class with aide.
+# Sensitivity Analysis
+```{r}
+# Get a list of all unique school IDs
+all_schools <- unique(df_subset$schid)
+# Create a vector to store results
+results <- numeric(length(all_schools))
+
+for(i in 1:length(all_schools)) {
+  # Excluding one school
+  temp_data <- subset(df_subset, schid != all_schools[i])
+  
+  # Run simplified model for speed)
+  temp_model <- lmer(score ~ class_type + grade + race + (1|stdntid), data = temp_data)
+  
+  # Coefficient for small class size
+  results[i] <- fixef(temp_model)["class_typesmall"]
+}
+
+plot(results, main="Sensitivity: Leave-One-School-Out", ylab="Small Class Coefficient")
+abline(h = mean(results), col="red")
+```
 
 ```{r}
-model <- lm(score~class_type+subject+class_type*subject, df_subset)
-summary(model)
-anova(model)
+library(influence.ME)
+
+# Calculate influence of schools
+influence_school <- influence(mixed_model_std_sch, group="schid")
+
+# Plot Cook's Distance
+plot(influence_school, which="cook")
 ```
+
 
 # Conclusion
 
