@@ -6,7 +6,7 @@ format: html
 # Data loading and Libraries
 
 ```{r}
-load("C:/Users/user/Documents/GitHub/STA207/sta207-project/data/df_subset.rda")
+load("C:/Users/user/Documents/GitHub/sta207-project/data/df_subset.rda")
 
 # Convert column "subject" into factor
 df_subset$subject <- as.factor(df_subset$subject)
@@ -15,6 +15,7 @@ df_subset$subject <- as.factor(df_subset$subject)
 library(dplyr)
 library(car)
 library(lme4)
+library(influence.ME)
 ```
 
 # Check For Collinearity
@@ -48,6 +49,12 @@ print(check_stdnt_sch)
 
 ### Multiple Linear Regression
 To find the best multiple linear model, we begin with our full model selected from our EDA.
+We make the following assumptions for our models:
+
+1. Linearity: The relationship between predictors and the outcome is linear.
+2. Independence: Observations (students) are independent.
+3. Homoscedasticity: The variance of error terms is constant across groups.
+4. Normality: The residuals are approximately normally distributed.
 
 ```{r}
 full_model <- lm(score ~ class_type+subject+class_type+gender+race+grade+urban, df_subset)
@@ -108,14 +115,6 @@ mixed_model_std_sch <- lmer(score
 summary(mixed_model_std_sch)
 ```
 
----
-
-We make the following assumptions for our models:
-
-1. Linearity: The relationship between predictors and the outcome is linear.
-2. Independence: Observations (students) are independent.
-3. Homoscedasticity: The variance of error terms is constant across groups.
-4. Normality: The residuals are approximately normally distributed.
 
 # Sensitivity Analysis
 ```{r}
@@ -140,8 +139,6 @@ abline(h = mean(results), col="red")
 ```
 
 ```{r}
-library(influence.ME)
-
 # Calculate influence of schools
 influence_school <- influence(mixed_model_std_sch, group="schid")
 
