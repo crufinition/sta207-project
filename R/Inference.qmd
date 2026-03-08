@@ -19,6 +19,11 @@ library(influence.ME)
 ```
 
 # Check For Collinearity
+*TO-DO*
+1. Try interaction terms for MLR and LMM
+2. Finish plausibility check for the final model
+3. Create images of the models' equations
+4. Use type II ANOVA instead if no interaction term is included
 
 For each school, it has a unique `urban` status.
 ```{r}
@@ -28,7 +33,7 @@ check_nesting <- df_subset %>%
   summarize(n_urban_types = n_distinct(urban)) %>%
   summarize(max_n_urban = max(n_urban_types))
 
-print(check_nesting)
+#print(check_nesting)
 ```
 
 All students go to one school only.
@@ -39,7 +44,7 @@ check_stdnt_sch <- df_subset %>%
   summarize(n_schs = n_distinct(schid)) %>%
   summarize(max_n_schs = max(n_schs))
 
-print(check_stdnt_sch)
+#print(check_stdnt_sch)
 ```
 
 
@@ -48,6 +53,7 @@ print(check_stdnt_sch)
 ## Model Proposal:
 
 ### Multiple Linear Regression
+
 To find the best multiple linear model, we begin with our full model selected from our EDA.
 We make the following assumptions for our models:
 
@@ -114,7 +120,6 @@ mixed_model_std_sch <- lmer(score
 
 summary(mixed_model_std_sch)
 ```
-
 
 # Sensitivity Analysis
 ```{r}
