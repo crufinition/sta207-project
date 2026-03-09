@@ -6,7 +6,7 @@ format: html
 # Data loading and Libraries
 
 ```{r}
-load("C:/Users/user/Documents/GitHub/sta207-project/data/df_subset.rda")
+load("C:/Users/user/Documents/GitHub/STA207/sta207-project/data/df_subset.rda")
 
 # Convert column "subject" into factor
 df_subset$subject <- as.factor(df_subset$subject)
@@ -18,12 +18,8 @@ library(lme4)
 library(influence.ME)
 ```
 
+<!-- 
 # Check For Collinearity
-*TO-DO*
-1. Try interaction terms for MLR and LMM
-2. Finish plausibility check for the final model
-3. Create images of the models' equations
-4. Use type II ANOVA instead if no interaction term is included
 
 For each school, it has a unique `urban` status.
 ```{r}
@@ -46,7 +42,7 @@ check_stdnt_sch <- df_subset %>%
 
 #print(check_stdnt_sch)
 ```
-
+-->
 
 # Inferential Analysis
 
@@ -63,20 +59,39 @@ We make the following assumptions for our models:
 4. Normality: The residuals are approximately normally distributed.
 
 ```{r}
-full_model <- lm(score ~ class_type+subject+class_type+gender+race+grade+urban, df_subset)
+full_model <- lm(score ~ class_type+subject+gender+race+grade+urban, df_subset)
 summary(full_model)
 ```
 
 From the summary statistic, we see that all the variables are signifcantly associated with score.
 
+#### Include Interaction Terms
+
+Including the interaction of subject and grade significantly reduced the curvature of the residuals versus fitted values plot, so we include this interaction term for the following models.
+```{r}
+plot(full_model, which=1)
+
+inter_full <- lm(score ~ class_type+subject+gender+grade+urban+race+subject*grade, df_subset)
+summary(inter_full)
+plot(inter_full, which=1)
+```
+
+#### ANOVA With Type III Sum of Square
+
 We consider running ANOVA on this full model using Type III Sum of Squares:
 ```{r}
-Anova(full_model, type="III")
+Anova(inter_full, type="III")
 ```
 
 From the summaries of multiple linear model and the ANOVA, we don't find any variable that is obviously irrelavant to scores. Thus, we keep all these variables and continue to fit our mixed effect model to discover causal relationship.
 
-### Mixed Effects Model
+### Mixed Models
+We make the following assumptions for our mixed models:
+
+1. Linearity: The relationship between predictors and the outcome is linear.
+2. Independence: Observations (students) are independent.
+3. Homoscedasticity: The variance of error terms is constant across groups.
+4. Normality: The residuals are approximately normally distributed.
 Stratifying using `schid`: Grouping students by schools.
 
 ```{r}
@@ -86,6 +101,7 @@ mixed_model_sch <- lmer(score
     + gender
     + race
     + grade
+    + subject*grade
     + (1|schid),
     data=df_subset)
 
@@ -100,6 +116,7 @@ mixed_model_std <- lmer(score
     + gender
     + race
     + grade
+    + subject*grade
     + (1|stdntid),
     data=df_subset)
 
@@ -114,26 +131,43 @@ mixed_model_std_sch <- lmer(score
     + gender
     + race
     + grade
+    + subject*grade
     + (1|stdntid)
     + (1|schid),
     data=df_subset)
 
 summary(mixed_model_std_sch)
 ```
+<!--
+```{r}
+mixed_model_std_sch_grade <- lmer(score
+    ~ class_type
+    + subject
+    + gender
+    + race
+    + subject*grade
+    + (grade|stdntid),
+    data=df_subset)
+
+anova(mixed_model_std, mixed_model_std_sch_grade)
+```
+-->
 
 # Sensitivity Analysis
+
 ```{r}
 # Get a list of all unique school IDs
 all_schools <- unique(df_subset$schid)
 # Create a vector to store results
 results <- numeric(length(all_schools))
 
-for(i in 1:length(all_schools)) {
+#for(i in 1:length(all_schools)) {
+for(i in 1:3) {
   # Excluding one school
   temp_data <- subset(df_subset, schid != all_schools[i])
   
-  # Run simplified model for speed)
-  temp_model <- lmer(score ~ class_type + grade + race + (1|stdntid), data = temp_data)
+  #temp_model <- lmer(score ~ class_type + grade + gender + subject + race + subject*grade + (1|stdntid), data = temp_data)
+  temp_model <- lmer(score ~ class_type + grade + gender + subject + race + subject*grade + (1|stdntid), data = temp_data)
   
   # Coefficient for small class size
   results[i] <- fixef(temp_model)["class_typesmall"]
@@ -145,13 +179,77 @@ abline(h = mean(results), col="red")
 
 ```{r}
 # Calculate influence of schools
-influence_school <- influence(mixed_model_std_sch, group="schid")
+# influence_school <- influence(mixed_model_std_sch, group="schid")
 
 # Plot Cook's Distance
-plot(influence_school, which="cook")
+# plot(influence_school, which="cook")
 ```
 
+# Plausibility Check
+<!-- TO-DO: Finish plausibility check for the final model -->
+## Linearity Check
+
+```{r}
+plot(mixed_model_std_sch)
+```
+
+## Normality of Residuals and Random Effects
+```{r}
+# Plot the histogram of residuals
+res <- residuals(mixed_model_std_sch)
+
+# Plot the histogram
+hist(res, 
+     breaks = 50, 
+     col = "skyblue", 
+     xlim = c(-100, 100),
+     main = "Histogram of Residuals", 
+     xlab = "Residuals")
+
+x <- seq(min(res), max(res), length = 100)
+y <- dnorm(x, mean = mean(res), sd = sd(res))/3.6
+y <- y * diff(hist(res, plot = FALSE)$mids[1:2]) * length(res)
+lines(x, y, col = "red", lwd = 2)
+```
+
+```{r}
+# Plot the histogram for random effect: student
+random_effects <- ranef(mixed_model_std_sch)
+student_intercepts <- random_effects$stdntid[, "(Intercept)"]
+hist(student_intercepts, 
+     breaks = 20, 
+     col = "darkseagreen", 
+     main = "Histogram of Random Intercepts (Students)", 
+     xlab = "Random Effect Estimate")
+```
+
+```{r}
+# Plot the histogram for random effect: school
+# Since we have 75 schools only, the normality isn't visible
+random_effects <- ranef(mixed_model_std_sch)
+school_intercepts <- random_effects$schid[, "(Intercept)"]
+hist(student_intercepts, 
+     breaks = 7, 
+     col = "darkseagreen", 
+     main = "Histogram of Random Intercepts (Schools)", 
+     xlab = "Random Effect Estimate")
+```
+
+## Homoscedasticity
+```{r}
+plot(mixed_model_std_sch)
+```
+
+<!--
+## Independence
+```{r}
+acf(res, main="ACF of Model Residuals")
+```
+-->
 
 # Conclusion
 
 Small class indeed leads to better students' performance, regardless of which school they attend or the innate intellegence each student have.
+
+
+<!-- TO-DO: Create images of the models' equations -->
