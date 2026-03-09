@@ -140,42 +140,52 @@ Attaching package: 'car'</code></pre>
 <div class="cell-output cell-output-stderr">
 <pre><code>Loading required package: Matrix</code></pre>
 </div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(influence.ME)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Attaching package: 'influence.ME'</code></pre>
 </div>
-</section>
-<section id="check-for-collinearity" class="level1">
-<h1>Check For Collinearity</h1>
-<p>For each school, it has a unique <code>urban</code> status.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows a school that has the most urban type(s)</span></span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>check_nesting <span class="ot">&lt;-</span> df_subset <span class="sc">%&gt;%</span></span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(schid) <span class="sc">%&gt;%</span></span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_urban_types =</span> <span class="fu">n_distinct</span>(urban)) <span class="sc">%&gt;%</span></span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_n_urban =</span> <span class="fu">max</span>(n_urban_types))</span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(check_nesting)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 1
-  max_n_urban
-        &lt;int&gt;
-1           1</code></pre>
+<div class="cell-output cell-output-stderr">
+<pre><code>The following object is masked from 'package:stats':
+
+    influence</code></pre>
 </div>
 </div>
-<p>All students go to one school only.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Shows a school that has the most urban type(s)</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>check_stdnt_sch <span class="ot">&lt;-</span> df_subset <span class="sc">%&gt;%</span></span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(stdntid) <span class="sc">%&gt;%</span></span>
-<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n_schs =</span> <span class="fu">n_distinct</span>(schid)) <span class="sc">%&gt;%</span></span>
-<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">max_n_schs =</span> <span class="fu">max</span>(n_schs))</span>
-<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(check_stdnt_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 1 × 1
-  max_n_schs
-       &lt;int&gt;
-1          1</code></pre>
-</div>
-</div>
+<!-- 
+# Check For Collinearity
+
+For each school, it has a unique `urban` status.
+
+::: {.cell}
+
+```{.r .cell-code}
+# Shows a school that has the most urban type(s)
+check_nesting <- df_subset %>%
+  group_by(schid) %>%
+  summarize(n_urban_types = n_distinct(urban)) %>%
+  summarize(max_n_urban = max(n_urban_types))
+
+#print(check_nesting)
+```
+:::
+
+
+All students go to one school only.
+
+::: {.cell}
+
+```{.r .cell-code}
+# Shows a school that has the most urban type(s)
+check_stdnt_sch <- df_subset %>%
+  group_by(stdntid) %>%
+  summarize(n_schs = n_distinct(schid)) %>%
+  summarize(max_n_schs = max(n_schs))
+
+#print(check_stdnt_sch)
+```
+:::
+
+-->
 </section>
 <section id="inferential-analysis" class="level1">
 <h1>Inferential Analysis</h1>
@@ -183,15 +193,21 @@ Attaching package: 'car'</code></pre>
 <h2 class="anchored" data-anchor-id="model-proposal">Model Proposal:</h2>
 <section id="multiple-linear-regression" class="level3">
 <h3 class="anchored" data-anchor-id="multiple-linear-regression">Multiple Linear Regression</h3>
-<p>To find the best multiple linear model, we begin with our full model selected from our EDA.</p>
+<p>To find the best multiple linear model, we begin with our full model selected from our EDA. We make the following assumptions for our models:</p>
+<ol type="1">
+<li>Linearity: The relationship between predictors and the outcome is linear.</li>
+<li>Independence: Observations (students) are independent.</li>
+<li>Homoscedasticity: The variance of error terms is constant across groups.</li>
+<li>Normality: The residuals are approximately normally distributed.</li>
+</ol>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(score <span class="sc">~</span> class_type<span class="sc">+</span>subject<span class="sc">+</span>class_type<span class="sc">+</span>gender<span class="sc">+</span>race<span class="sc">+</span>grade<span class="sc">+</span>urban, df_subset)</span>
-<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>full_model <span class="ot">&lt;-</span> <span class="fu">lm</span>(score <span class="sc">~</span> class_type<span class="sc">+</span>subject<span class="sc">+</span>gender<span class="sc">+</span>race<span class="sc">+</span>grade<span class="sc">+</span>urban, df_subset)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(full_model)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>
 Call:
-lm(formula = score ~ class_type + subject + class_type + gender + 
-    race + grade + urban, data = df_subset)
+lm(formula = score ~ class_type + subject + gender + race + grade + 
+    urban, data = df_subset)
 
 Residuals:
      Min       1Q   Median       3Q      Max 
@@ -224,315 +240,476 @@ F-statistic:  1537 on 14 and 29528 DF,  p-value: &lt; 2.2e-16</code></pre>
 </div>
 </div>
 <p>From the summary statistic, we see that all the variables are signifcantly associated with score.</p>
+<section id="include-interaction-terms" class="level4">
+<h4 class="anchored" data-anchor-id="include-interaction-terms">Include Interaction Terms</h4>
+<p>Including the interaction of subject and grade significantly reduced the curvature of the residuals versus fitted values plot, so we include this interaction term for the following models.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(full_model, <span class="at">which=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>inter_full <span class="ot">&lt;-</span> <span class="fu">lm</span>(score <span class="sc">~</span> class_type<span class="sc">+</span>subject<span class="sc">+</span>gender<span class="sc">+</span>grade<span class="sc">+</span>urban<span class="sc">+</span>race<span class="sc">+</span>subject<span class="sc">*</span>grade, df_subset)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(inter_full)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+Call:
+lm(formula = score ~ class_type + subject + gender + grade + 
+    urban + race + subject * grade, data = df_subset)
+
+Residuals:
+     Min       1Q   Median       3Q      Max 
+-151.587  -25.842   -2.249   24.094  155.544 
+
+Coefficients:
+                       Estimate Std. Error t value Pr(&gt;|t|)    
+(Intercept)            589.2875     4.6704 126.174  &lt; 2e-16 ***
+class_typeregular_plus   1.7086     0.5532   3.089 0.002011 ** 
+class_typesmall          8.8796     0.5651  15.713  &lt; 2e-16 ***
+subjectmath            -33.8422     0.9370 -36.117  &lt; 2e-16 ***
+subjectreading         -39.4829     0.9441 -41.821  &lt; 2e-16 ***
+gendermale              -1.5712     0.4470  -3.515 0.000441 ***
+grade2                  25.6380     0.9434  27.175  &lt; 2e-16 ***
+grade3                  52.2697     0.9441  55.365  &lt; 2e-16 ***
+urbanrural               6.5325     0.9720   6.721 1.84e-11 ***
+urbansuburban            8.7559     0.9344   9.371  &lt; 2e-16 ***
+urbanurban               3.8224     1.2136   3.150 0.001637 ** 
+raceblack              -39.4187     4.5717  -8.622  &lt; 2e-16 ***
+racehispanic           -11.1061     8.0709  -1.376 0.168814    
+raceother               -0.2631     8.6687  -0.030 0.975789    
+racewhite              -16.4951     4.5339  -3.638 0.000275 ***
+subjectmath:grade2      20.9913     1.3329  15.748  &lt; 2e-16 ***
+subjectreading:grade2   31.3082     1.3377  23.405  &lt; 2e-16 ***
+subjectmath:grade3      29.7311     1.3345  22.280  &lt; 2e-16 ***
+subjectreading:grade3   32.8994     1.3417  24.521  &lt; 2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+
+Residual standard error: 38.37 on 29524 degrees of freedom
+  (895 observations deleted due to missingness)
+Multiple R-squared:  0.4387,    Adjusted R-squared:  0.4384 
+F-statistic:  1282 on 18 and 29524 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(inter_full, <span class="at">which=</span><span class="dv">1</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-5-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="anova-with-type-iii-sum-of-square" class="level4">
+<h4 class="anchored" data-anchor-id="anova-with-type-iii-sum-of-square">ANOVA With Type III Sum of Square</h4>
 <p>We consider running ANOVA on this full model using Type III Sum of Squares:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(full_model, <span class="at">type=</span><span class="st">"III"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">Anova</span>(inter_full, <span class="at">type=</span><span class="st">"III"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>Anova Table (Type III tests)
 
 Response: score
-              Sum Sq    Df   F value    Pr(&gt;F)    
-(Intercept) 22639583     1 14925.026 &lt; 2.2e-16 ***
-class_type    424663     2   139.978 &lt; 2.2e-16 ***
-subject      2049456     2   675.547 &lt; 2.2e-16 ***
-gender         18162     1    11.973 0.0005404 ***
-race         1436747     4   236.792 &lt; 2.2e-16 ***
-grade       26610041     2  8771.265 &lt; 2.2e-16 ***
-urban         149340     3    32.817 &lt; 2.2e-16 ***
-Residuals   44790648 29528                        
+                Sum Sq    Df   F value    Pr(&gt;F)    
+(Intercept)   23433415     1 15919.796 &lt; 2.2e-16 ***
+class_type      426001     2   144.705 &lt; 2.2e-16 ***
+subject        3032875     2  1030.211 &lt; 2.2e-16 ***
+gender           18185     1    12.354 0.0004407 ***
+grade          4512064     2  1532.665 &lt; 2.2e-16 ***
+urban           148730     3    33.681 &lt; 2.2e-16 ***
+race           1436897     4   244.044 &lt; 2.2e-16 ***
+subject:grade  1332294     4   226.278 &lt; 2.2e-16 ***
+Residuals     43458354 29524                        
 ---
 Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1</code></pre>
 </div>
 </div>
 <p>From the summaries of multiple linear model and the ANOVA, we don’t find any variable that is obviously irrelavant to scores. Thus, we keep all these variables and continue to fit our mixed effect model to discover causal relationship.</p>
 </section>
-<section id="mixed-effects-model" class="level3">
-<h3 class="anchored" data-anchor-id="mixed-effects-model">Mixed Effects Model</h3>
-<p>Stratifying using <code>schid</code>: Grouping students by schools.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>mixed_model_sch <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
-<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
-<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
-<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
-<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
-<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
-<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
-<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
-<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: score ~ class_type + subject + gender + race + grade + (1 | schid)
-   Data: df_subset
-
-REML criterion at convergence: 298277.2
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--3.7565 -0.6788 -0.0423  0.6275  4.1076 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- schid    (Intercept)  139.6   11.82   
- Residual             1409.0   37.54   
-Number of obs: 29543, groups:  schid, 75
-
-Fixed effects:
-                       Estimate Std. Error t value
-(Intercept)            583.1098     4.7140 123.699
-class_typeregular_plus   0.7379     0.5566   1.326
-class_typesmall          9.4508     0.5661  16.694
-subjectmath            -17.0823     0.5338 -32.001
-subjectreading         -18.1964     0.5364 -33.924
-gendermale              -1.5986     0.4416  -3.620
-raceblack              -40.3274     4.5421  -8.879
-racehispanic           -11.6786     8.0134  -1.457
-raceother               -3.7593     8.5523  -0.440
-racewhite              -18.3140     4.4788  -4.089
-grade2                  43.0039     0.5342  80.501
-grade3                  73.0503     0.5349 136.570
-
-Correlation of Fixed Effects:
-            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
-clss_typrg_ -0.050                                                        
-clss_typsml -0.052  0.541                                                 
-subjectmath -0.057  0.000  0.000                                          
-subjectrdng -0.056  0.001  0.000  0.498                                   
-gendermale  -0.052 -0.022 -0.004  0.000  0.000                            
-raceblack   -0.938 -0.012 -0.013  0.000  0.000  0.004                     
-racehispanc -0.528 -0.009 -0.024  0.000  0.000 -0.008  0.548              
-raceother   -0.495 -0.014 -0.027  0.000  0.000 -0.003  0.515  0.292       
-racewhite   -0.945 -0.016 -0.015  0.000  0.000  0.008  0.980  0.558  0.524
-grade2      -0.056 -0.001  0.000  0.000 -0.002 -0.002  0.000  0.000  0.000
-grade3      -0.057 -0.003 -0.003  0.001 -0.002  0.001  0.001  0.003  0.000
-            racwht grade2
-clss_typrg_              
-clss_typsml              
-subjectmath              
-subjectrdng              
-gendermale               
-raceblack                
-racehispanc              
-raceother                
-racewhite                
-grade2       0.000       
-grade3       0.001  0.494</code></pre>
-</div>
-</div>
-<p>Stratifying using <code>stdntid</code>: Consider each student as a group.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
-<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
-<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
-<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
-<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
-<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
-<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid),</span>
-<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
-<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: score ~ class_type + subject + gender + race + grade + (1 | stdntid)
-   Data: df_subset
-
-REML criterion at convergence: 285058.7
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--3.8508 -0.6312 -0.0342  0.5820  5.6907 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- stdntid  (Intercept) 850.4    29.16   
- Residual             685.7    26.19   
-Number of obs: 29543, groups:  stdntid, 3382
-
-Fixed effects:
-                       Estimate Std. Error t value
-(Intercept)            584.3237    10.8015  54.097
-class_typeregular_plus   1.6135     1.2977   1.243
-class_typesmall          8.8961     1.3247   6.716
-subjectmath            -17.1176     0.3725 -45.958
-subjectreading         -18.3530     0.3743 -49.038
-gendermale              -1.6724     1.0500  -1.593
-raceblack              -43.3040    10.8233  -4.001
-racehispanic           -16.8158    18.7062  -0.899
-raceother               -1.0307    20.6175  -0.050
-racewhite              -17.5773    10.7822  -1.630
-grade2                  43.1266     0.3733 115.519
-grade3                  72.2933     0.3746 192.988
-
-Correlation of Fixed Effects:
-            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
-clss_typrg_ -0.045                                                        
-clss_typsml -0.047  0.544                                                 
-subjectmath -0.017  0.000  0.000                                          
-subjectrdng -0.017  0.001  0.000  0.498                                   
-gendermale  -0.060 -0.025  0.001  0.000  0.000                            
-raceblack   -0.990 -0.017 -0.020  0.000  0.000  0.011                     
-racehispanc -0.572 -0.010 -0.018  0.000  0.000 -0.007  0.572              
-raceother   -0.518 -0.020 -0.030  0.000  0.000 -0.002  0.520  0.301       
-racewhite   -0.994 -0.021 -0.018  0.000  0.000  0.012  0.993  0.575  0.522
-grade2      -0.017  0.000  0.000  0.000 -0.003 -0.001  0.000  0.000  0.000
-grade3      -0.017 -0.001 -0.001  0.001 -0.002  0.001  0.000  0.001  0.000
-            racwht grade2
-clss_typrg_              
-clss_typsml              
-subjectmath              
-subjectrdng              
-gendermale               
-raceblack                
-racehispanc              
-raceother                
-racewhite                
-grade2       0.000       
-grade3       0.000  0.493</code></pre>
-</div>
-</div>
-<p>Stratifying using both <code>schid</code> and <code>stdntid</code>: See how much does school affect the score.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std_sch <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
-<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
-<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
-<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
-<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
-<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
-<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid)</span>
-<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
-<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
-<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stdout">
-<pre><code>Linear mixed model fit by REML ['lmerMod']
-Formula: 
-score ~ class_type + subject + gender + race + grade + (1 | stdntid) +  
-    (1 | schid)
-   Data: df_subset
-
-REML criterion at convergence: 284819.6
-
-Scaled residuals: 
-    Min      1Q  Median      3Q     Max 
--3.8275 -0.6323 -0.0331  0.5811  5.6791 
-
-Random effects:
- Groups   Name        Variance Std.Dev.
- stdntid  (Intercept) 752.0    27.42   
- schid    (Intercept) 112.2    10.59   
- Residual             685.7    26.19   
-Number of obs: 29543, groups:  stdntid, 3382; schid, 75
-
-Fixed effects:
-                       Estimate Std. Error t value
-(Intercept)            583.9915    10.3859  56.229
-class_typeregular_plus   0.9408     1.2575   0.748
-class_typesmall          9.5681     1.2796   7.478
-subjectmath            -17.1174     0.3725 -45.957
-subjectreading         -18.3518     0.3743 -49.024
-gendermale              -1.6594     1.0018  -1.656
-raceblack              -42.1978    10.3928  -4.060
-racehispanic           -16.5231    17.9088  -0.923
-raceother               -3.8389    19.6483  -0.195
-racewhite              -18.5213    10.2863  -1.801
-grade2                  43.1221     0.3734 115.485
-grade3                  72.3041     0.3746 193.022
-
-Correlation of Fixed Effects:
-            (Intr) clss__ clss_t sbjctm sbjctr gndrml rcblck rchspn racthr
-clss_typrg_ -0.050                                                        
-clss_typsml -0.053  0.541                                                 
-subjectmath -0.018  0.000  0.000                                          
-subjectrdng -0.018  0.000  0.000  0.498                                   
-gendermale  -0.055 -0.022 -0.002  0.000  0.000                            
-raceblack   -0.979 -0.013 -0.015  0.000  0.000  0.005                     
-racehispanc -0.565 -0.006 -0.020  0.000  0.000 -0.009  0.566              
-raceother   -0.516 -0.014 -0.027  0.000  0.000 -0.002  0.517  0.300       
-racewhite   -0.986 -0.017 -0.015  0.000  0.000  0.008  0.985  0.572  0.523
-grade2      -0.018  0.000  0.000  0.000 -0.002 -0.001  0.000  0.000  0.000
-grade3      -0.018 -0.001 -0.001  0.001 -0.002  0.001  0.000  0.001  0.000
-            racwht grade2
-clss_typrg_              
-clss_typsml              
-subjectmath              
-subjectrdng              
-gendermale               
-raceblack                
-racehispanc              
-raceother                
-racewhite                
-grade2       0.000       
-grade3       0.000  0.493</code></pre>
-</div>
-</div>
-<hr>
-<p>We make the following assumptions for our models:</p>
+</section>
+<section id="mixed-models" class="level3">
+<h3 class="anchored" data-anchor-id="mixed-models">Mixed Models</h3>
+<p>We make the following assumptions for our mixed models:</p>
 <ol type="1">
 <li>Linearity: The relationship between predictors and the outcome is linear.</li>
 <li>Independence: Observations (students) are independent.</li>
 <li>Homoscedasticity: The variance of error terms is constant across groups.</li>
-<li>Normality: The residuals are approximately normally distributed.</li>
+<li>Normality: The residuals are approximately normally distributed. Stratifying using <code>schid</code>: Grouping students by schools.</li>
 </ol>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>mixed_model_sch <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject<span class="sc">*</span>grade</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb22-10"><a href="#cb22-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-11"><a href="#cb22-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: score ~ class_type + subject + gender + race + grade + subject *  
+    grade + (1 | schid)
+   Data: df_subset
+
+REML criterion at convergence: 297307.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.9478 -0.6791 -0.0543  0.6200  4.0348 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ schid    (Intercept)  139.8   11.82   
+ Residual             1363.9   36.93   
+Number of obs: 29543, groups:  schid, 75
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            595.7369     4.6640 127.731
+class_typeregular_plus   0.7405     0.5476   1.352
+class_typesmall          9.4688     0.5570  16.999
+subjectmath            -33.8350     0.9020 -37.511
+subjectreading         -39.5270     0.9096 -43.454
+gendermale              -1.6024     0.4345  -3.688
+raceblack              -40.3288     4.4690  -9.024
+racehispanic           -11.6954     7.8843  -1.483
+raceother               -3.7611     8.4144  -0.447
+racewhite              -18.3226     4.4066  -4.158
+grade2                  25.5944     0.9090  28.157
+grade3                  52.2653     0.9088  57.508
+subjectmath:grade2      20.9910     1.2831  16.360
+subjectreading:grade2   31.3725     1.2883  24.353
+subjectmath:grade3      29.7020     1.2846  23.122
+subjectreading:grade3   32.8988     1.2915  25.473</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Correlation matrix not shown by default, as p = 16 &gt; 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it</code></pre>
+</div>
+</div>
+<p>Stratifying using <code>stdntid</code>: Consider each student as a group.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject<span class="sc">*</span>grade</span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid),</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: score ~ class_type + subject + gender + race + grade + subject *  
+    grade + (1 | stdntid)
+   Data: df_subset
+
+REML criterion at convergence: 282999.7
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.7840 -0.6234 -0.0456  0.5595  5.7292 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stdntid  (Intercept) 857.9    29.29   
+ Residual             633.9    25.18   
+Number of obs: 29543, groups:  stdntid, 3382
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            597.0626    10.8148  55.208
+class_typeregular_plus   1.6093     1.2987   1.239
+class_typesmall          8.9145     1.3257   6.724
+subjectmath            -33.8351     0.6151 -55.011
+subjectreading         -39.9706     0.6205 -64.417
+gendermale              -1.6798     1.0508  -1.599
+raceblack              -43.3233    10.8332  -3.999
+racehispanic           -16.8647    18.7186  -0.901
+raceother               -1.0377    20.6363  -0.050
+racewhite              -17.6176    10.7920  -1.632
+grade2                  25.6072     0.6202  41.290
+grade3                  51.3673     0.6206  82.766
+subjectmath:grade2      20.9379     0.8749  23.933
+subjectreading:grade2   31.7702     0.8786  36.160
+subjectmath:grade3      29.6467     0.8760  33.844
+subjectreading:grade3   33.3462     0.8809  37.853</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Correlation matrix not shown by default, as p = 16 &gt; 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it</code></pre>
+</div>
+</div>
+<p>Stratifying using both <code>schid</code> and <code>stdntid</code>: See how much does school affect the score.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>mixed_model_std_sch <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="sc">~</span> class_type</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> gender</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> race</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> grade</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> subject<span class="sc">*</span>grade</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>    <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>schid),</span>
+<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">data=</span>df_subset)</span>
+<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(mixed_model_std_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Linear mixed model fit by REML ['lmerMod']
+Formula: score ~ class_type + subject + gender + race + grade + subject *  
+    grade + (1 | stdntid) + (1 | schid)
+   Data: df_subset
+
+REML criterion at convergence: 282761.1
+
+Scaled residuals: 
+    Min      1Q  Median      3Q     Max 
+-3.7771 -0.6273 -0.0483  0.5628  5.7179 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ stdntid  (Intercept) 759.4    27.56   
+ schid    (Intercept) 112.2    10.59   
+ Residual             633.9    25.18   
+Number of obs: 29543, groups:  stdntid, 3382; schid, 75
+
+Fixed effects:
+                       Estimate Std. Error t value
+(Intercept)            596.7196    10.4000  57.377
+class_typeregular_plus   0.9446     1.2585   0.751
+class_typesmall          9.5915     1.2807   7.489
+subjectmath            -33.8344     0.6151 -55.009
+subjectreading         -39.9688     0.6206 -64.405
+gendermale              -1.6717     1.0027  -1.667
+raceblack              -42.2240    10.4033  -4.059
+racehispanic           -16.5880    17.9220  -0.926
+raceother               -3.8470    19.6683  -0.196
+racewhite              -18.5423    10.2968  -1.801
+grade2                  25.6012     0.6203  41.275
+grade3                  51.3804     0.6206  82.787
+subjectmath:grade2      20.9383     0.8749  23.933
+subjectreading:grade2   31.7706     0.8787  36.158
+subjectmath:grade3      29.6452     0.8760  33.842
+subjectreading:grade3   33.3394     0.8810  37.845</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>
+Correlation matrix not shown by default, as p = 16 &gt; 12.
+Use print(x, correlation=TRUE)  or
+    vcov(x)        if you need it</code></pre>
+</div>
+</div>
+<!--
+
+::: {.cell}
+
+```{.r .cell-code}
+mixed_model_std_sch_grade <- lmer(score
+    ~ class_type
+    + subject
+    + gender
+    + race
+    + subject*grade
+    + (grade|stdntid),
+    data=df_subset)
+
+anova(mixed_model_std, mixed_model_std_sch_grade)
+```
+
+::: {.cell-output .cell-output-stderr}
+
+```
+refitting model(s) with ML (instead of REML)
+```
+
+
+:::
+
+::: {.cell-output .cell-output-stdout}
+
+```
+Data: df_subset
+Models:
+mixed_model_std: score ~ class_type + subject + gender + race + grade + subject * grade + (1 | stdntid)
+mixed_model_std_sch_grade: score ~ class_type + subject + gender + race + subject * grade + (grade | stdntid)
+                          npar    AIC    BIC  logLik -2*log(L)  Chisq Df
+mixed_model_std             18 283070 283219 -141517    283034          
+mixed_model_std_sch_grade   23 282697 282888 -141326    282651 382.93  5
+                          Pr(>Chisq)    
+mixed_model_std                         
+mixed_model_std_sch_grade  < 2.2e-16 ***
+---
+Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+```
+
+
+:::
+:::
+
+-->
 </section>
 </section>
 </section>
 <section id="sensitivity-analysis" class="level1">
 <h1>Sensitivity Analysis</h1>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a list of all unique school IDs</span></span>
-<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>all_schools <span class="ot">&lt;-</span> <span class="fu">unique</span>(df_subset<span class="sc">$</span>schid)</span>
-<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector to store results</span></span>
-<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(all_schools))</span>
-<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="fu">length</span>(all_schools)) {</span>
-<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Excluding one school</span></span>
-<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>  temp_data <span class="ot">&lt;-</span> <span class="fu">subset</span>(df_subset, schid <span class="sc">!=</span> all_schools[i])</span>
-<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Run simplified model for speed)</span></span>
-<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  temp_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score <span class="sc">~</span> class_type <span class="sc">+</span> grade <span class="sc">+</span> race <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid), <span class="at">data =</span> temp_data)</span>
-<span id="cb25-12"><a href="#cb25-12" aria-hidden="true" tabindex="-1"></a>  </span>
-<span id="cb25-13"><a href="#cb25-13" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Coefficient for small class size</span></span>
-<span id="cb25-14"><a href="#cb25-14" aria-hidden="true" tabindex="-1"></a>  results[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(temp_model)[<span class="st">"class_typesmall"</span>]</span>
-<span id="cb25-15"><a href="#cb25-15" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb25-16"><a href="#cb25-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb25-17"><a href="#cb25-17" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(results, <span class="at">main=</span><span class="st">"Sensitivity: Leave-One-School-Out"</span>, <span class="at">ylab=</span><span class="st">"Small Class Coefficient"</span>)</span>
-<span id="cb25-18"><a href="#cb25-18" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">mean</span>(results), <span class="at">col=</span><span class="st">"red"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Get a list of all unique school IDs</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>all_schools <span class="ot">&lt;-</span> <span class="fu">unique</span>(df_subset<span class="sc">$</span>schid)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Create a vector to store results</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">numeric</span>(<span class="fu">length</span>(all_schools))</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="co">#for(i in 1:length(all_schools)) {</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span>(i <span class="cf">in</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>) {</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Excluding one school</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  temp_data <span class="ot">&lt;-</span> <span class="fu">subset</span>(df_subset, schid <span class="sc">!=</span> all_schools[i])</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a>  <span class="co">#temp_model &lt;- lmer(score ~ class_type + grade + gender + subject + race + subject*grade + (1|stdntid), data = temp_data)</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  temp_model <span class="ot">&lt;-</span> <span class="fu">lmer</span>(score <span class="sc">~</span> class_type <span class="sc">+</span> grade <span class="sc">+</span> gender <span class="sc">+</span> subject <span class="sc">+</span> race <span class="sc">+</span> subject<span class="sc">*</span>grade <span class="sc">+</span> (<span class="dv">1</span><span class="sc">|</span>stdntid), <span class="at">data =</span> temp_data)</span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Coefficient for small class size</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  results[i] <span class="ot">&lt;-</span> <span class="fu">fixef</span>(temp_model)[<span class="st">"class_typesmall"</span>]</span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-18"><a href="#cb31-18" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(results, <span class="at">main=</span><span class="st">"Sensitivity: Leave-One-School-Out"</span>, <span class="at">ylab=</span><span class="st">"Small Class Coefficient"</span>)</span>
+<span id="cb31-19"><a href="#cb31-19" aria-hidden="true" tabindex="-1"></a><span class="fu">abline</span>(<span class="at">h =</span> <span class="fu">mean</span>(results), <span class="at">col=</span><span class="st">"red"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Inference_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Inference_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(influence.ME)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'influence.ME'</code></pre>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate influence of schools</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a><span class="co"># influence_school &lt;- influence(mixed_model_std_sch, group="schid")</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Cook's Distance</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co"># plot(influence_school, which="cook")</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following object is masked from 'package:stats':
-
-    influence</code></pre>
-</div>
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Calculate influence of schools</span></span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>influence_school <span class="ot">&lt;-</span> <span class="fu">influence</span>(mixed_model_std_sch, <span class="at">group=</span><span class="st">"schid"</span>)</span>
-<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot Cook's Distance</span></span>
-<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(influence_school, <span class="at">which=</span><span class="st">"cook"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="plausibility-check" class="level1">
+<h1>Plausibility Check</h1>
+<!-- TO-DO: Finish plausibility check for the final model -->
+<section id="linearity-check" class="level2">
+<h2 class="anchored" data-anchor-id="linearity-check">Linearity Check</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mixed_model_std_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Inference_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid figure-img" width="672"></p>
+<p><img src="Inference_files/figure-html/unnamed-chunk-13-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
 </div>
 </section>
+<section id="normality-of-residuals-and-random-effects" class="level2">
+<h2 class="anchored" data-anchor-id="normality-of-residuals-and-random-effects">Normality of Residuals and Random Effects</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the histogram of residuals</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">residuals</span>(mixed_model_std_sch)</span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the histogram</span></span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(res, </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="dv">50</span>, </span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"skyblue"</span>, </span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlim =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">100</span>, <span class="dv">100</span>),</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Residuals"</span>, </span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Residuals"</span>)</span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">seq</span>(<span class="fu">min</span>(res), <span class="fu">max</span>(res), <span class="at">length =</span> <span class="dv">100</span>)</span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">dnorm</span>(x, <span class="at">mean =</span> <span class="fu">mean</span>(res), <span class="at">sd =</span> <span class="fu">sd</span>(res))<span class="sc">/</span><span class="fl">3.6</span></span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> y <span class="sc">*</span> <span class="fu">diff</span>(<span class="fu">hist</span>(res, <span class="at">plot =</span> <span class="cn">FALSE</span>)<span class="sc">$</span>mids[<span class="dv">1</span><span class="sc">:</span><span class="dv">2</span>]) <span class="sc">*</span> <span class="fu">length</span>(res)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a><span class="fu">lines</span>(x, y, <span class="at">col =</span> <span class="st">"red"</span>, <span class="at">lwd =</span> <span class="dv">2</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the histogram for random effect: student</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>random_effects <span class="ot">&lt;-</span> <span class="fu">ranef</span>(mixed_model_std_sch)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>student_intercepts <span class="ot">&lt;-</span> random_effects<span class="sc">$</span>stdntid[, <span class="st">"(Intercept)"</span>]</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(student_intercepts, </span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="dv">20</span>, </span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"darkseagreen"</span>, </span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Random Intercepts (Students)"</span>, </span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Random Effect Estimate"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-15-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Plot the histogram for random effect: school</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="co"># Since we have 75 schools only, the normality isn't visible</span></span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>random_effects <span class="ot">&lt;-</span> <span class="fu">ranef</span>(mixed_model_std_sch)</span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>school_intercepts <span class="ot">&lt;-</span> random_effects<span class="sc">$</span>schid[, <span class="st">"(Intercept)"</span>]</span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a><span class="fu">hist</span>(student_intercepts, </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">breaks =</span> <span class="dv">7</span>, </span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>     <span class="at">col =</span> <span class="st">"darkseagreen"</span>, </span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"Histogram of Random Intercepts (Schools)"</span>, </span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>     <span class="at">xlab =</span> <span class="st">"Random Effect Estimate"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-16-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="homoscedasticity" class="level2">
+<h2 class="anchored" data-anchor-id="homoscedasticity">Homoscedasticity</h2>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(mixed_model_std_sch)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Inference_files/figure-html/unnamed-chunk-17-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<!--
+## Independence
+
+::: {.cell}
+
+```{.r .cell-code}
+acf(res, main="ACF of Model Residuals")
+```
+
+::: {.cell-output-display}
+![](Inference_files/figure-html/unnamed-chunk-18-1.png){width=672}
+:::
+:::
+
+-->
+</section>
+</section>
 <section id="conclusion" class="level1">
 <h1>Conclusion</h1>
 <p>Small class indeed leads to better students’ performance, regardless of which school they attend or the innate intellegence each student have.</p>
+<!-- TO-DO: Create images of the models' equations -->
 </section>
 
 </main>
