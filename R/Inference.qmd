@@ -5,8 +5,8 @@ format: html
 
 # Data loading and Libraries
 
-```{r}
-load("C:/Users/user/Documents/GitHub/STA207/sta207-project/data/df_subset.rda")
+```{r, load_data_&_libraries}
+load("C:/Users/user/Documents/GitHub/sta207-project/data/df_subset.rda")
 
 # Convert column "subject" into factor
 df_subset$subject <- as.factor(df_subset$subject)
@@ -58,7 +58,7 @@ We make the following assumptions for our models:
 3. Homoscedasticity: The variance of error terms is constant across groups.
 4. Normality: The residuals are approximately normally distributed.
 
-```{r}
+```{r, basic_MLR_model}
 full_model <- lm(score ~ class_type+subject+gender+race+grade+urban, df_subset)
 summary(full_model)
 ```
@@ -92,6 +92,7 @@ We make the following assumptions for our mixed models:
 2. Independence: Observations (students) are independent.
 3. Homoscedasticity: The variance of error terms is constant across groups.
 4. Normality: The residuals are approximately normally distributed.
+
 Stratifying using `schid`: Grouping students by schools.
 
 ```{r}
@@ -109,6 +110,7 @@ summary(mixed_model_sch)
 ```
 
 Stratifying using `stdntid`: Consider each student as a group.
+This is our final model.
 ```{r}
 mixed_model_std <- lmer(score
     ~ class_type
@@ -121,8 +123,10 @@ mixed_model_std <- lmer(score
     data=df_subset)
 
 summary(mixed_model_std)
+final_model <- mixed_model_std
 ```
 
+<!--
 Stratifying using both `schid` and `stdntid`: See how much does school affect the score.
 ```{r}
 mixed_model_std_sch <- lmer(score
@@ -138,19 +142,6 @@ mixed_model_std_sch <- lmer(score
 
 summary(mixed_model_std_sch)
 ```
-<!--
-```{r}
-mixed_model_std_sch_grade <- lmer(score
-    ~ class_type
-    + subject
-    + gender
-    + race
-    + subject*grade
-    + (grade|stdntid),
-    data=df_subset)
-
-anova(mixed_model_std, mixed_model_std_sch_grade)
-```
 -->
 
 # Sensitivity Analysis
@@ -161,12 +152,10 @@ all_schools <- unique(df_subset$schid)
 # Create a vector to store results
 results <- numeric(length(all_schools))
 
-#for(i in 1:length(all_schools)) {
-for(i in 1:3) {
+for(i in 1:length(all_schools)) {
   # Excluding one school
   temp_data <- subset(df_subset, schid != all_schools[i])
   
-  #temp_model <- lmer(score ~ class_type + grade + gender + subject + race + subject*grade + (1|stdntid), data = temp_data)
   temp_model <- lmer(score ~ class_type + grade + gender + subject + race + subject*grade + (1|stdntid), data = temp_data)
   
   # Coefficient for small class size
@@ -179,24 +168,24 @@ abline(h = mean(results), col="red")
 
 ```{r}
 # Calculate influence of schools
-# influence_school <- influence(mixed_model_std_sch, group="schid")
+influence_school <- influence(mixed_model_std_sch, group="schid")
 
 # Plot Cook's Distance
-# plot(influence_school, which="cook")
+plot(influence_school, which="cook")
 ```
 
 # Plausibility Check
-<!-- TO-DO: Finish plausibility check for the final model -->
 ## Linearity Check
 
+
 ```{r}
-plot(mixed_model_std_sch)
+plot(final_model)
 ```
 
 ## Normality of Residuals and Random Effects
 ```{r}
 # Plot the histogram of residuals
-res <- residuals(mixed_model_std_sch)
+res <- residuals(final_model)
 
 # Plot the histogram
 hist(res, 
@@ -214,7 +203,7 @@ lines(x, y, col = "red", lwd = 2)
 
 ```{r}
 # Plot the histogram for random effect: student
-random_effects <- ranef(mixed_model_std_sch)
+random_effects <- ranef(final_model)
 student_intercepts <- random_effects$stdntid[, "(Intercept)"]
 hist(student_intercepts, 
      breaks = 20, 
@@ -223,21 +212,24 @@ hist(student_intercepts,
      xlab = "Random Effect Estimate")
 ```
 
+<!--
+Our final model doesn't take school_id as random effect due to the fact that the grouping of student is a refinement of the grouping of school (each student attends one school only)
 ```{r}
 # Plot the histogram for random effect: school
 # Since we have 75 schools only, the normality isn't visible
-random_effects <- ranef(mixed_model_std_sch)
+random_effects <- ranef(final_model)
 school_intercepts <- random_effects$schid[, "(Intercept)"]
-hist(student_intercepts, 
+hist(school_intercepts, 
      breaks = 7, 
      col = "darkseagreen", 
      main = "Histogram of Random Intercepts (Schools)", 
      xlab = "Random Effect Estimate")
 ```
+-->
 
 ## Homoscedasticity
 ```{r}
-plot(mixed_model_std_sch)
+plot(final_model)
 ```
 
 <!--
