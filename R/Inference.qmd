@@ -16,6 +16,8 @@ library(dplyr)
 library(car)
 library(lme4)
 library(influence.ME)
+library(broom.mixed) # For turning model results into tables
+library(tidyverse)
 ```
 
 # Inferential Analysis
@@ -98,6 +100,7 @@ mixed_model_std <- lmer(score
 
 summary(mixed_model_std)
 final_model <- mixed_model_std
+#confint(final_model)
 ```
 
 Stratifying using both `schid` and `stdntid`: See how much does school affect the score.
@@ -138,12 +141,93 @@ plot(results, main="Sensitivity: Leave-One-School-Out", ylab="Small Class Coeffi
 abline(h = mean(results), col="red")
 ```
 
-```{r, influence plot}
-# Calculate influence of schools
-influence_school <- influence(mixed_model_std_sch, group="schid")
+```{r, subgroup}
+categories <- list(
+  subject = c("math", "reading", "listening"),
+  race = c("white", "black"),
+  urban = c("urban", "suburban", "inner city"),
+  gender = c("male", "female"),
+  grade = c("1", "2", "3")
+)
 
-# Plot Cook's Distance
-plot(influence_school, which="cook")
+# Function to run model and extract the "Small Class" coefficient
+get_effect <- function(col_name, group_val, my_form) {
+  sub_data <- df_subset %>% filter(!!sym(col_name) == group_val)
+  
+  model <- lmer(as.formula(my_form), data = sub_data)
+  
+  tidy(model, conf.int = TRUE, conf.method = "Wald") %>%
+    filter(term == "class_typesmall") %>%
+    select(estimate, conf.low, conf.high) %>%
+    mutate(subgroup = paste(col_name, ":", group_val), category = col_name)
+}
+
+subject1 <- get_effect("subject", "math", "score ~ gender + race + class_type + grade + urban + (1 | stdntid)")
+subject2 <- get_effect("subject", "reading", "score ~ gender + race + class_type + grade + urban + (1 | stdntid)")
+subject3 <- get_effect("subject", "listening", "score ~ gender + race + class_type + grade + urban + (1 | stdntid)")
+
+grade1 <- get_effect("grade", "1", "score ~ gender + race + class_type + subject + urban + (1 | stdntid)")
+grade2 <- get_effect("grade", "2", "score ~ gender + race + class_type + subject + urban + (1 | stdntid)")
+grade3 <- get_effect("grade", "3", "score ~ gender + race + class_type + subject + urban + (1 | stdntid)")
+
+gender1 <- get_effect("gender", "male", "score ~ grade + race + class_type + subject + urban + subject*grade + (1 | stdntid)")
+gender2 <- get_effect("gender", "female", "score ~ grade + race + class_type + subject + urban + subject*grade + (1 | stdntid)")
+
+#race1 <- get_effect("race", "asian", "score ~ grade + gender + class_type + subject + urban + subject*grade + (1 | stdntid)")
+race2 <- get_effect("race", "black", "score ~ grade + gender + class_type + subject + urban + subject*grade + (1 | stdntid)")
+#race3 <- get_effect("race", "hispanic", "score ~ grade + gender + class_type + subject + urban + subject*grade + (1 | stdntid)")
+#race4 <- get_effect("race", "other", "score ~ grade + gender + class_type + subject + urban + subject*grade + (1 | stdntid)")
+race5 <- get_effect("race", "white", "score ~ grade + gender + class_type + subject + urban + subject*grade + (1 | stdntid)")
+
+urban1 <- get_effect("urban", "inner city", "score ~ grade + gender + class_type + subject + race + subject*grade + (1 | stdntid)")
+urban2 <- get_effect("urban", "rural", "score ~ grade + gender + class_type + subject + race + subject*grade + (1 | stdntid)")
+urban3 <- get_effect("urban", "suburban", "score ~ grade + gender + class_type + subject + race + subject*grade + (1 | stdntid)")
+urban4 <- get_effect("urban", "urban", "score ~ grade + gender + class_type + subject + race + subject*grade + (1 | stdntid)")
+
+all_results <- bind_rows(subject1, subject2, subject3,
+    grade1, grade2, grade3,
+    gender1, gender2,
+    race2, race5,
+    urban1, urban2, urban3, urban4)
+all_results
+
+par(mar = c(5, 10, 4, 2) + 0.1)
+# Create a blank plot area
+plot(all_results$estimate, 1:nrow(all_results), 
+     pch = 19, xlim = range(c(all_results$conf.low, all_results$conf.high)),
+     yaxt = "n", xlab = "Estimate and 95% CI", ylab = "", 
+     main = "Small Class Effect by Subgroup")
+
+# Add the subgroup labels to the y-axis
+axis(2, at = 1:nrow(all_results), labels = all_results$subgroup, las = 1)
+
+# Add the confidence interval lines
+arrows(all_results$conf.low, 1:nrow(all_results), 
+       all_results$conf.high, 1:nrow(all_results), 
+       angle = 90, code = 3, length = 0.05)
+
+# Add a vertical reference line at 0
+#abline(v = 0, col = "red", lty = 2)
+
+#### I DO NOT LIKE GGPLOT
+#### WASTED TOO MUCH TIME TO debug
+#### YET IT STILL DOESN'T WORK!!!
+
+# Create the Forest Plot
+#ggplot(all_results, aes(x = estimate, y = subgroup)) +
+  # Add the point for the mean estimate
+#  geom_point(size = 3, color = "midnightblue") +
+  # Add the horizontal error bars (CI)
+#  geom_errorbarh(aes(xmin = conf.low, xmax = conf.high), height = 0.2) +
+  # Add a vertical line at 0 (No Effect line)
+#  geom_vline(xintercept = 0, linetype = "dashed", color = "red") +
+  # Clean up the labels
+#  labs(
+#    title = "Small Class Effect Size by Subject",
+#    x = "Estimated Score Increase (with 95% CI)",
+#    y = "Subject Subgroup"
+#  ) +
+#  theme_minimal()
 ```
 
 # Plausibility Check
@@ -172,7 +256,18 @@ y <- y * diff(hist(res, plot = FALSE)$mids[1:2]) * length(res)
 lines(x, y, col = "red", lwd = 2)
 ```
 
-```{r, histogram of intercepts of student}
+```{r, histogram of intercepts of schools}
+# Plot the histogram for random effect: student
+random_effects <- ranef(mixed_model_sch)
+school_intercepts <- random_effects$schid[, "(Intercept)"]
+hist(school_intercepts, 
+     breaks = 7, 
+     col = "darkseagreen", 
+     main = "Histogram of Random Intercepts (Schools)", 
+     xlab = "Random Effect Estimate")
+```
+
+```{r, histogram of intercepts of students}
 # Plot the histogram for random effect: student
 random_effects <- ranef(final_model)
 student_intercepts <- random_effects$stdntid[, "(Intercept)"]
@@ -191,6 +286,3 @@ plot(final_model)
 # Conclusion
 
 Small class indeed leads to better students' performance, regardless of which school they attend or the innate intelligence each student have.
-
-
-<!-- TO-DO: Create images of the models' equations -->
